@@ -29,15 +29,21 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const email = credentials?.email;
+        const password = credentials?.password;
+
+        if (
+          typeof email !== "string" ||
+          typeof password !== "string" ||
+          !email.trim() ||
+          !password
+        ) {
           return null;
         }
 
-        const email = credentials.email.toLowerCase().trim();
-
         const user = await prisma.user.findUnique({
           where: {
-            email,
+            email: email.toLowerCase().trim(),
           },
           include: {
             category: true,
@@ -48,10 +54,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const passwordValid = await bcrypt.compare(
-          credentials.password,
-          user.passwordHash,
-        );
+        const passwordValid = await bcrypt.compare(password, user.passwordHash);
 
         if (!passwordValid) {
           return null;
@@ -83,7 +86,7 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id;
         session.user.role = token.role;
         session.user.categoryId = token.categoryId;
         session.user.categoryName = token.categoryName;

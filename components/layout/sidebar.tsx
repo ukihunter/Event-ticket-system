@@ -19,11 +19,7 @@ const navigation = [
     href: "/tickets",
     icon: Ticket,
   },
-  {
-    label: "Requests",
-    href: "/requests",
-    icon: ClipboardList,
-  },
+
   {
     label: "Scanner",
     href: "/scanner",

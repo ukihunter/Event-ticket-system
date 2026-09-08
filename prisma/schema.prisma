@@ -32,11 +32,6 @@ enum CheckInStatus {
   CHECKED_IN
 }
 
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
 
 enum AuditAction {
   TICKET_CREATED
@@ -60,7 +55,7 @@ model User {
 
   ticketsCreated    Ticket[]       @relation("TicketsCreated")
   ticketsScanned    Ticket[]       @relation("TicketsScanned")
-  requestsProcessed TicketRequest[]
+
   auditLogs         AuditLog[]
 
   createdAt DateTime @default(now())
@@ -77,7 +72,7 @@ model Category {
 
   users          User[]
   tickets        Ticket[]
-  ticketRequests TicketRequest[]
+
   ticketSequence TicketSequence?
 
   createdAt DateTime @default(now())
@@ -124,25 +119,7 @@ model Ticket {
   @@index([createdAt])
 }
 
-model TicketRequest {
-  id              String @id @default(cuid())
-  participantName String
 
-  categoryId String
-  category   Category @relation(fields: [categoryId],references: [id])
-
-  status RequestStatus @default(PENDING)
-
-  processedById String?
-  processedBy   User? @relation(fields: [processedById],references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([categoryId])
-  @@index([status])
-  @@index([processedById])
-}
 
 model AuditLog {
   id     String      @id @default(cuid())
