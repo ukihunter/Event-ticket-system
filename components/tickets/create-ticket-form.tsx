@@ -1,15 +1,21 @@
 "use client";
 
-import { FormEvent, useMemo, useState, useEffect } from "react";
-import { CheckCircle2, Loader2, Ticket } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+
+import { CheckCircle2, Loader2, Printer, Ticket } from "lucide-react";
+
 import Link from "next/link";
+
+import { generateTicketPdf } from "@/lib/generate-ticket-pdf";
 
 type Category = {
   id: string;
   name: string;
   code: string;
 };
+
 type PaymentStatus = "UNPAID" | "PAID";
+
 type CreateTicketFormProps = {
   categories: Category[];
   userRole: "ADMIN" | "CATEGORY_STAFF";
@@ -21,6 +27,7 @@ type CreatedTicket = {
   id: string;
   ticketNumber: string;
   participantName: string;
+  qrToken: string;
   paymentStatus: string;
   checkInStatus: string;
   category: {
@@ -37,14 +44,23 @@ export function CreateTicketForm({
   userCategoryName,
 }: CreateTicketFormProps) {
   const [participantName, setParticipantName] = useState("");
+
   const [categoryId, setCategoryId] = useState(
     userRole === "CATEGORY_STAFF" ? (userCategoryId ?? "") : "",
   );
+
   const [nextTicketNumber, setNextTicketNumber] = useState("");
+
   const [loadingNextNumber, setLoadingNextNumber] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("UNPAID");
+
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("PAID");
+
   const [loading, setLoading] = useState(false);
+
+  const [printing, setPrinting] = useState(false);
+
   const [error, setError] = useState("");
+
   const [createdTicket, setCreatedTicket] = useState<CreatedTicket | null>(
     null,
   );
@@ -53,6 +69,11 @@ export function CreateTicketForm({
     () => categories.find((category) => category.id === categoryId),
     [categories, categoryId],
   );
+
+  // ------------------------------------------------------------
+  // Load next ticket number
+  // ------------------------------------------------------------
+
   useEffect(() => {
     if (!categoryId) {
       return;
@@ -65,7 +86,9 @@ export function CreateTicketForm({
 
       try {
         const response = await fetch(
-          `/api/tickets/next-number?categoryId=${encodeURIComponent(categoryId)}`,
+          `/api/tickets/next-number?categoryId=${encodeURIComponent(
+            categoryId,
+          )}`,
           {
             method: "GET",
             cache: "no-store",
@@ -102,6 +125,61 @@ export function CreateTicketForm({
       cancelled = true;
     };
   }, [categoryId]);
+
+  // ------------------------------------------------------------
+  // Print ticket
+  // ------------------------------------------------------------
+
+  async function handlePrintTicket() {
+    if (!createdTicket || printing) {
+      return;
+    }
+
+    setError("");
+    setPrinting(true);
+
+    try {
+      const pdf = await generateTicketPdf({
+        ticketNumber: createdTicket.ticketNumber,
+        qrToken: createdTicket.qrToken,
+      });
+
+      const blob = pdf.output("blob");
+
+      const url = URL.createObjectURL(blob);
+
+      const printWindow = window.open(url, "_blank");
+
+      if (!printWindow) {
+        URL.revokeObjectURL(url);
+
+        setError(
+          "Unable to open the ticket PDF. Please allow pop-ups and try again.",
+        );
+
+        return;
+      }
+
+      /*
+       * Give the browser time to load the PDF before
+       * releasing the object URL.
+       */
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 60_000);
+    } catch (error) {
+      console.error("Failed to generate ticket PDF:", error);
+
+      setError("Failed to generate the ticket PDF. Please try again.");
+    } finally {
+      setPrinting(false);
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Create ticket
+  // ------------------------------------------------------------
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -139,11 +217,11 @@ export function CreateTicketForm({
 
       if (!response.ok || !data.success) {
         setError(data.message ?? "Failed to create the ticket.");
+
         return;
       }
 
       setCreatedTicket(data.ticket);
-
       setParticipantName("");
     } catch {
       setError("Something went wrong. Please try again.");
@@ -160,6 +238,8 @@ export function CreateTicketForm({
     return (
       <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
         <div className="flex flex-col items-center text-center">
+          {/* Success icon */}
+
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10">
             <CheckCircle2 className="h-7 w-7 text-green-500" />
           </div>
@@ -172,7 +252,8 @@ export function CreateTicketForm({
             The ticket was successfully created.
           </p>
 
-          {/* Ticket number */}
+          {/* Ticket details */}
+
           <div className="mt-6 w-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
               Ticket Number
@@ -183,6 +264,8 @@ export function CreateTicketForm({
             </p>
 
             <div className="mt-5 space-y-3 border-t border-zinc-800 pt-4 text-left">
+              {/* Participant */}
+
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm text-zinc-500">Participant</span>
 
@@ -190,6 +273,8 @@ export function CreateTicketForm({
                   {createdTicket.participantName}
                 </span>
               </div>
+
+              {/* Category */}
 
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm text-zinc-500">Category</span>
@@ -199,6 +284,8 @@ export function CreateTicketForm({
                 </span>
               </div>
 
+              {/* Payment */}
+
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm text-zinc-500">Payment</span>
 
@@ -206,6 +293,8 @@ export function CreateTicketForm({
                   {createdTicket.paymentStatus}
                 </span>
               </div>
+
+              {/* Check-in */}
 
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm text-zinc-500">Check-in</span>
@@ -217,22 +306,53 @@ export function CreateTicketForm({
             </div>
           </div>
 
+          {/* Error */}
+
+          {error && (
+            <div className="mt-4 w-full rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-3 text-left text-sm text-red-400">
+              {error}
+            </div>
+          )}
+
           {/* Actions */}
+
           <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row">
+            {/* Print */}
+
+            <button
+              type="button"
+              onClick={handlePrintTicket}
+              disabled={printing}
+              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {printing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Printer className="h-4 w-4" />
+              )}
+
+              {printing ? "Generating..." : "Print Ticket"}
+            </button>
+
+            {/* Create Another */}
+
             <button
               type="button"
               onClick={() => {
                 setCreatedTicket(null);
+                setError("");
               }}
-              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700"
+              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-white"
             >
               <Ticket className="h-4 w-4" />
               Create Another
             </button>
 
+            {/* View Tickets */}
+
             <Link
               href="/tickets"
-              className="flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-700 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-white"
+              className="flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-800 px-4 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white"
             >
               View Tickets
             </Link>
@@ -253,6 +373,7 @@ export function CreateTicketForm({
     >
       <div className="space-y-6">
         {/* Ticket number preview */}
+
         <div>
           <label
             htmlFor="ticketNumber"
@@ -283,7 +404,9 @@ export function CreateTicketForm({
             automatically when the ticket is created.
           </p>
         </div>
+
         {/* Participant name */}
+
         <div>
           <label
             htmlFor="participantName"
@@ -306,6 +429,7 @@ export function CreateTicketForm({
         </div>
 
         {/* Category */}
+
         <div>
           <label
             htmlFor="category"
@@ -351,7 +475,9 @@ export function CreateTicketForm({
             </select>
           )}
         </div>
+
         {/* Payment status */}
+
         <div>
           <label
             htmlFor="paymentStatus"
@@ -384,11 +510,14 @@ export function CreateTicketForm({
               Paid
             </option>
           </select>
+
           <p className="mt-2 text-xs text-zinc-600">
             Select whether the participant has already paid for the ticket.
           </p>
         </div>
+
         {/* Error */}
+
         {error && (
           <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-3 text-sm text-red-400">
             {error}
@@ -396,6 +525,7 @@ export function CreateTicketForm({
         )}
 
         {/* Submit */}
+
         <button
           type="submit"
           disabled={loading}
