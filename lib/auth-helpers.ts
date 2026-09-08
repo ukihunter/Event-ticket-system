@@ -23,7 +23,7 @@ export async function requireAdmin() {
   const user = await requireAuth();
 
   if (user.role !== "ADMIN") {
-    redirect("/dashboard");
+    redirect("/tickets");
   }
 
   return user;
@@ -33,7 +33,7 @@ export async function requireCategoryStaff() {
   const user = await requireAuth();
 
   if (user.role !== "ADMIN" && user.role !== "CATEGORY_STAFF") {
-    redirect("/dashboard");
+    redirect("/tickets");
   }
 
   return user;
@@ -43,7 +43,7 @@ export async function requireCategoryAccess(categoryId: string) {
   const user = await requireCategoryStaff();
 
   if (user.role !== "ADMIN" && user.categoryId !== categoryId) {
-    redirect("/dashboard");
+    redirect("/tickets");
   }
 
   return user;

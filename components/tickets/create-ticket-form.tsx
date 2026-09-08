@@ -316,43 +316,39 @@ export function CreateTicketForm({
 
           {/* Actions */}
 
-          <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row">
+          <div className="mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
             {/* Print */}
-
             <button
               type="button"
               onClick={handlePrintTicket}
               disabled={printing}
-              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {printing ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Printer className="h-4 w-4" />
               )}
-
               {printing ? "Generating..." : "Print Ticket"}
             </button>
 
             {/* Create Another */}
-
             <button
               type="button"
               onClick={() => {
                 setCreatedTicket(null);
                 setError("");
               }}
-              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-white"
+              className="flex h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-white"
             >
               <Ticket className="h-4 w-4" />
               Create Another
             </button>
 
             {/* View Tickets */}
-
             <Link
               href="/tickets"
-              className="flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-800 px-4 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white"
+              className="flex h-11 items-center justify-center rounded-lg border border-zinc-800 px-4 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white"
             >
               View Tickets
             </Link>

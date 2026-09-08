@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { requireAuth } from "@/lib/auth-helpers";
+
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 
@@ -9,8 +10,10 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  let user;
+
   try {
-    await requireAuth();
+    user = await requireAuth();
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       redirect("/login");
@@ -24,7 +27,7 @@ export default async function DashboardLayout({
       <Sidebar />
 
       <div className="md:pl-64">
-        <MobileNav />
+        <MobileNav user={user} />
 
         <main className="min-h-screen p-4 md:p-6 lg:p-8">{children}</main>
       </div>
