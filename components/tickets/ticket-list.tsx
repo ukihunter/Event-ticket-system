@@ -142,14 +142,15 @@ export function TicketList({ tickets, categories, userRole }: TicketListProps) {
         qrToken: ticket.qrToken,
       });
 
-      const blob = pdf.output("blob");
-      const url = URL.createObjectURL(blob);
+      const participantName =
+        ticket.participantName
+          ?.trim()
+          .replace(/[^a-zA-Z0-9\s_-]/g, "")
+          .replace(/\s+/g, "-") || "Ticket";
 
-      window.open(url, "_blank");
+      const fileName = `${participantName}-${ticket.ticketNumber}.pdf`;
 
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 60_000);
+      pdf.save(fileName);
     } catch (error) {
       console.error("Failed to generate ticket PDF:", error);
       alert("Failed to generate the ticket PDF. Please try again.");

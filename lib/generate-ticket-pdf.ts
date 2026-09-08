@@ -61,7 +61,9 @@ export async function generateTicketPdf({
 
   pdf.addImage(templateDataUrl, "PNG", 0, 0, TEMPLATE_WIDTH, TEMPLATE_HEIGHT);
 
+  // --------------------------------------------------
   // Ticket number
+  // --------------------------------------------------
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(150);
@@ -88,6 +90,10 @@ export async function generateTicketPdf({
   const qrY = (TEMPLATE_HEIGHT - qrSize) / 2;
 
   pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+
+  // --------------------------------------------------
+  // QR instruction
+  // --------------------------------------------------
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(32);
