@@ -1,6 +1,8 @@
+import { requireAdmin } from "@/lib/auth-helpers";
 import { Users } from "lucide-react";
 
-export default function UsersPage() {
+export default async function UsersPage() {
+  await requireAdmin();
   return (
     <div className="space-y-6">
       <div>

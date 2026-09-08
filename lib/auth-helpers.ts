@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 
@@ -12,7 +13,7 @@ export async function requireAuth() {
   const user = await getCurrentUser();
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    redirect("/login");
   }
 
   return user;
@@ -22,7 +23,7 @@ export async function requireAdmin() {
   const user = await requireAuth();
 
   if (user.role !== "ADMIN") {
-    throw new Error("FORBIDDEN");
+    redirect("/dashboard");
   }
 
   return user;
@@ -32,7 +33,7 @@ export async function requireCategoryStaff() {
   const user = await requireAuth();
 
   if (user.role !== "ADMIN" && user.role !== "CATEGORY_STAFF") {
-    throw new Error("FORBIDDEN");
+    redirect("/dashboard");
   }
 
   return user;
@@ -42,7 +43,7 @@ export async function requireCategoryAccess(categoryId: string) {
   const user = await requireCategoryStaff();
 
   if (user.role !== "ADMIN" && user.categoryId !== categoryId) {
-    throw new Error("FORBIDDEN");
+    redirect("/dashboard");
   }
 
   return user;

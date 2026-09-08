@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Seeded Login Credentials
 
-## Getting Started
+These accounts are automatically created when the database seed is run.
 
-First, run the development server:
+> **Important:** These are development/seed credentials. Change all passwords before using the application in production.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Admin Account
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Role          | Email                      | Password         |
+| ------------- | -------------------------- | ---------------- |
+| Administrator | `admin@eventtickets.local` | `Admin@2026!X9p` |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Category Staff Accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Category    | Role           | Email                           | Password        |
+| ----------- | -------------- | ------------------------------- | --------------- |
+| Biology     | Category Staff | `biology@eventtickets.local`    | `Bio@2026!K7x`  |
+| Mathematics | Category Staff | `math@eventtickets.local`       | `Math@2026!P4q` |
+| Art         | Category Staff | `art@eventtickets.local`        | `Art@2026!R8m`  |
+| Commerce    | Category Staff | `commerce@eventtickets.local`   | `Com@2026!T6v`  |
+| Technology  | Category Staff | `technology@eventtickets.local` | `Tech@2026!N3z` |
+| OL          | Category Staff | `ol@eventtickets.local`         | `OL@2026!W9k`   |
 
-## Learn More
+## Login Details
 
-To learn more about Next.js, take a look at the following resources:
+### Administrator
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Email:** `admin@eventtickets.local`
+- **Password:** `Admin@2026!X9p`
+- **Role:** `ADMIN`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Biology
 
-## Deploy on Vercel
+- **Email:** `biology@eventtickets.local`
+- **Password:** `Bio@2026!K7x`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `Biology`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Mathematics
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Email:** `math@eventtickets.local`
+- **Password:** `Math@2026!P4q`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `Mathematics`
+
+### Art
+
+- **Email:** `art@eventtickets.local`
+- **Password:** `Art@2026!R8m`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `Art`
+
+### Commerce
+
+- **Email:** `commerce@eventtickets.local`
+- **Password:** `Com@2026!T6v`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `Commerce`
+
+### Technology
+
+- **Email:** `technology@eventtickets.local`
+- **Password:** `Tech@2026!N3z`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `Technology`
+
+### OL
+
+- **Email:** `ol@eventtickets.local`
+- **Password:** `OL@2026!W9k`
+- **Role:** `CATEGORY_STAFF`
+- **Category:** `OL`
