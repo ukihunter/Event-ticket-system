@@ -14,6 +14,7 @@ const createTicketSchema = z.object({
     .max(150, "Participant name is too long."),
 
   categoryId: z.string().cuid("Invalid category."),
+  paymentStatus: z.enum(["UNPAID", "PAID"]),
 });
 
 export async function POST(request: Request) {
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { participantName, categoryId } = parsed.data;
+    const { participantName, categoryId, paymentStatus } = parsed.data;
 
     // ----------------------------------------------------------
     // Category authorization
@@ -108,6 +109,7 @@ export async function POST(request: Request) {
       participantName,
       categoryId,
       createdById: user.id,
+      paymentStatus,
     });
 
     return NextResponse.json(

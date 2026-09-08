@@ -6,10 +6,12 @@ export async function createTicket({
   participantName,
   categoryId,
   createdById,
+  paymentStatus,
 }: {
   participantName: string;
   categoryId: string;
   createdById: string;
+  paymentStatus: "UNPAID" | "PAID";
 }) {
   return prisma.$transaction(async (tx) => {
     // ----------------------------------------------------------
@@ -70,7 +72,7 @@ export async function createTicket({
         ticketNumber: formattedTicketNumber,
         participantName: participantName.trim(),
         qrToken,
-
+        paymentStatus,
         categoryId: category.id,
 
         createdById,
@@ -96,6 +98,7 @@ export async function createTicket({
           ticketNumber: ticket.ticketNumber,
           participantName: ticket.participantName,
           category: category.code,
+          paymentStatus: ticket.paymentStatus,
         },
       },
     });

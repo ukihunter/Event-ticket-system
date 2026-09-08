@@ -9,7 +9,7 @@ type Category = {
   name: string;
   code: string;
 };
-
+type PaymentStatus = "UNPAID" | "PAID";
 type CreateTicketFormProps = {
   categories: Category[];
   userRole: "ADMIN" | "CATEGORY_STAFF";
@@ -42,7 +42,7 @@ export function CreateTicketForm({
   );
   const [nextTicketNumber, setNextTicketNumber] = useState("");
   const [loadingNextNumber, setLoadingNextNumber] = useState(false);
-
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("UNPAID");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [createdTicket, setCreatedTicket] = useState<CreatedTicket | null>(
@@ -131,6 +131,7 @@ export function CreateTicketForm({
         body: JSON.stringify({
           participantName: trimmedName,
           categoryId,
+          paymentStatus,
         }),
       });
 
@@ -350,7 +351,43 @@ export function CreateTicketForm({
             </select>
           )}
         </div>
+        {/* Payment status */}
+        <div>
+          <label
+            htmlFor="paymentStatus"
+            className="mb-2 block text-sm font-medium text-zinc-300"
+          >
+            Payment Status
+          </label>
 
+          <select
+            id="paymentStatus"
+            name="paymentStatus"
+            value={paymentStatus}
+            onChange={(event) =>
+              setPaymentStatus(event.target.value as PaymentStatus)
+            }
+            disabled={loading}
+            className="h-11 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm font-sans text-white outline-none transition focus:border-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option
+              value="UNPAID"
+              className="bg-zinc-900 text-sm font-sans text-white"
+            >
+              Unpaid
+            </option>
+
+            <option
+              value="PAID"
+              className="bg-zinc-900 text-sm font-sans text-white"
+            >
+              Paid
+            </option>
+          </select>
+          <p className="mt-2 text-xs text-zinc-600">
+            Select whether the participant has already paid for the ticket.
+          </p>
+        </div>
         {/* Error */}
         {error && (
           <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-3 text-sm text-red-400">
