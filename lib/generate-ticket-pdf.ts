@@ -9,7 +9,7 @@ type TicketPdfData = {
 const TEMPLATE_WIDTH = 3650;
 const TEMPLATE_HEIGHT = 1710;
 
-const TICKET_NUMBER_X = 3090;
+const TICKET_NUMBER_X = 150;
 const TICKET_NUMBER_Y = 390;
 
 function loadImageAsDataUrl(src: string): Promise<string> {
@@ -65,11 +65,14 @@ export async function generateTicketPdf({
   // Ticket number
   // --------------------------------------------------
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(150);
+  pdf.setFont("times", "bold");
+  pdf.setFontSize(100);
   pdf.setTextColor(250, 250, 250);
 
-  pdf.text(ticketNumber, TICKET_NUMBER_X, TICKET_NUMBER_Y);
+  // pdf.text(ticketNumber, TICKET_NUMBER_X, TICKET_NUMBER_Y);
+  pdf.text(ticketNumber, TICKET_NUMBER_X, TICKET_NUMBER_Y, {
+    angle: 90,
+  });
 
   // --------------------------------------------------
   // PDF PAGE 2

@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
-const TICKET_PRICE = 3800;
+const TICKET_PRICE = 3900;
 
 export default async function DashboardPage() {
   await requireAdmin();
